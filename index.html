@@ -6,27 +6,6 @@
 <title>Gerador de Prompts Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
 <style>
-<script>
-document.querySelector("button").addEventListener("click", function(){
-
-let texto = document.querySelector("textarea").value;
-let url = document.querySelector("input[type='text']").value;
-
-let resultado = `
-Crie uma imagem ultra realista baseada na seguinte descrição:
-
-${texto}
-
-Caso exista referência visual na URL:
-${url}
-
-A imagem deve conter iluminação cinematográfica, detalhes em alta definição, textura realista, profundidade de campo e cores vibrantes.
-`;
-
-document.querySelector(".result").innerText = resultado;
-
-});
-</script>
 body{
 margin:0;
 font-family:'Poppins', sans-serif;
@@ -73,10 +52,12 @@ margin-top:20px;
 background:#2a2a2a;
 padding:20px;
 border-radius:10px;
+white-space:pre-wrap;
 }
 </style>
 </head>
 <body>
+
 <div class="container">
 <h1>Gerador de Prompt IA</h1>
 
@@ -91,9 +72,29 @@ border-radius:10px;
 <div class="result">
 Seu prompt detalhado aparecerá aqui...
 </div>
-
 </div>
+
+<script>
+document.querySelector("button").addEventListener("click", function(){
+
+let texto = document.querySelector("textarea").value;
+let url = document.querySelector("input[type='text']").value;
+
+let resultado = `
+Crie uma imagem ultra realista baseada na seguinte descrição:
+
+${texto}
+
+Caso exista referência visual na URL:
+${url}
+
+A imagem deve conter iluminação cinematográfica, detalhes em alta definição, textura realista, profundidade de campo e cores vibrantes.
+`;
+
+document.querySelector(".result").innerText = resultado;
+
+});
+</script>
+
 </body>
-
 </html>
-
