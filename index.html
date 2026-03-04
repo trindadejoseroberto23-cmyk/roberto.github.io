@@ -1,250 +1,76 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agente Build - Gerador de Prompts Detalhado</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --secondary: #ec4899;
-            --accent: #8b5cf6;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --text: #1e293b;
-            --text-secondary: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: var(--text);
-            line-height: 1.6;
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; }
-        header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 20px 30px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .logo i { font-size: 32px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .user-info { display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-weight: 500; }
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-        .main-card { background: var(--surface); border-radius: 24px; padding: 40px; box-shadow: var(--shadow-lg); flex: 1; border: 1px solid rgba(255, 255, 255, 0.3); }
-        .card-header { margin-bottom: 30px; }
-        .card-header h1 { font-size: 32px; font-weight: 700; margin-bottom: 10px; color: var(--text); }
-        .card-header p { color: var(--text-secondary); font-size: 16px; }
-        .input-section { margin-bottom: 25px; }
-        .section-title { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .section-title i { color: var(--primary); }
-        .url-input-wrapper { display: flex; gap: 10px; }
-        .url-input { flex: 1; padding: 16px 20px; border: 2px solid var(--border); border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 15px; transition: all 0.3s ease; background: var(--bg); }
-        .url-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
-        .load-url-btn { padding: 16px 24px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
-        .load-url-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
-        .divider { display: flex; align-items: center; margin: 25px 0; color: var(--text-secondary); font-size: 14px; }
-        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-        .divider span { padding: 0 15px; }
-        .upload-section { margin-bottom: 25px; }
-        .upload-placeholder { border: 2px dashed var(--border); border-radius: 16px; padding: 50px 20px; text-align: center; background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%); transition: all 0.3s ease; cursor: pointer; }
-        .upload-placeholder:hover { border-color: var(--primary); background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%); }
-        .upload-placeholder i { font-size: 48px; color: var(--primary); margin-bottom: 16px; }
-        .upload-placeholder h3 { color: var(--text); margin-bottom: 8px; font-size: 18px; }
-        .upload-placeholder p { color: var(--text-secondary); font-size: 14px; }
-        .upload-placeholder .formats { margin-top: 12px; font-size: 12px; color: var(--primary); font-weight: 500; }
-        .image-preview { display: none; position: relative; margin-top: 20px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
-        .image-preview img { width: 100%; max-height: 400px; object-fit: contain; background: #f1f5f9; }
-        .remove-image { position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.9); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; font-size: 18px; }
-        .remove-image:hover { background: #dc2626; transform: scale(1.1); }
-        .ai-selection { margin-bottom: 25px; }
-        .ai-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
-        .ai-option { padding: 14px 16px; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px; font-weight: 600; background: var(--surface); font-size: 14px; }
-        .ai-option:hover { border-color: var(--primary-light); transform: translateY(-2px); box-shadow: var(--shadow); }
-        .ai-option.active { border-color: var(--primary); background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); color: var(--primary); }
-        .ai-option i { font-size: 18px; }
-        .action-buttons { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-        .action-btn { padding: 12px 20px; border: 2px solid var(--border); background: var(--surface); border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; transition: all 0.3s ease; font-size: 14px; }
-        .action-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
-        .submit-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
-        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .result-area { display: none; margin-top: 30px; padding: 30px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%); border-radius: 16px; border: 2px solid var(--primary-light); animation: slideIn 0.5s ease; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-        .result-header h3 { color: var(--primary); font-size: 18px; display: flex; align-items: center; gap: 8px; }
-        .result-actions { display: flex; gap: 10px; }
-        .copy-btn { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px; transition: all 0.3s; }
-        .copy-btn:hover { background: var(--primary-dark); }
-        .clear-btn { padding: 10px 20px; background: transparent; color: var(--text-secondary); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px; transition: all 0.3s; }
-        .clear-btn:hover { border-color: #ef4444; color: #ef4444; }
-        .result-content { background: white; padding: 25px; border-radius: 12px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.9; color: var(--text); white-space: pre-wrap; max-height: 500px; overflow-y: auto; border: 1px solid var(--border); }
-        .loading { display: none; text-align: center; padding: 40px; }
-        .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @media (max-width: 768px) { .container { padding: 10px; } header { padding: 15px 20px; flex-direction: column; gap: 15px; text-align: center; } .main-card { padding: 25px; } .card-header h1 { font-size: 24px; } .ai-grid { grid-template-columns: repeat(2, 1fr); } .url-input-wrapper { flex-direction: column; } .action-buttons { flex-direction: column; } .action-btn { width: 100%; justify-content: center; } .result-header { flex-direction: column; align-items: flex-start; } .result-actions { width: 100%; } .copy-btn, .clear-btn { flex: 1; justify-content: center; } }
-        .toast { position: fixed; bottom: 30px; right: 30px; background: var(--text); color: white; padding: 16px 24px; border-radius: 12px; box-shadow: var(--shadow-lg); display: none; align-items: center; gap: 12px; animation: slideUp 0.3s ease; z-index: 1000; }
-        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .toast.show { display: flex; }
-        .toast.success { background: #10b981; }
-        .toast.error { background: #ef4444; }
-        .error-message { display: none; padding: 15px 20px; background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 12px; color: #dc2626; margin-bottom: 20px; align-items: center; gap: 10px; }
-        .error-message.show { display: flex; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Prompts Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+<style>
+body{
+margin:0;
+font-family:'Poppins', sans-serif;
+background:#0f0f0f;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+}
+.container{
+width:90%;
+max-width:700px;
+background:#1a1a1a;
+padding:40px;
+border-radius:20px;
+box-shadow:0 0 30px rgba(0,0,0,0.5);
+}
+h1{
+text-align:center;
+margin-bottom:30px;
+}
+input, textarea{
+width:100%;
+padding:15px;
+margin-bottom:15px;
+border:none;
+border-radius:10px;
+background:#2a2a2a;
+color:white;
+}
+button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#00ff88;
+color:black;
+font-weight:600;
+cursor:pointer;
+}
+.result{
+margin-top:20px;
+background:#2a2a2a;
+padding:20px;
+border-radius:10px;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo"><i class="fas fa-cube"></i><span>AGENTE BUILD</span></div>
-            <div class="user-info"><div class="user-avatar">ST</div><span>Olá, Silva Trindade</span></div>
-        </header>
-        <main class="main-card">
-            <div class="card-header"><h1>Gerador de Prompts Detalhado</h1><p>Cole uma URL ou carregue uma imagem de referência e gere prompts detalhados para qualquer IA</p></div>
-            <div class="error-message" id="errorMessage"><i class="fas fa-exclamation-circle"></i><span id="errorText"></span></div>
-            <div class="input-section">
-                <div class="section-title"><i class="fas fa-link"></i>URL da Imagem de Referência</div>
-                <div class="url-input-wrapper">
-                    <input type="url" class="url-input" id="urlInput" placeholder="Cole aqui a URL da imagem (ex: https://exemplo.com/imagem.jpg)">
-                    <button class="load-url-btn" onclick="loadFromURL()"><i class="fas fa-download"></i>Carregar</button>
-                </div>
-            </div>
-            <div class="divider"><span>OU</span></div>
-            <div class="upload-section">
-                <div class="section-title"><i class="fas fa-cloud-upload-alt"></i>Carregar Imagem de Referência</div>
-                <div class="upload-placeholder" id="uploadPlaceholder">
-                    <i class="fas fa-image"></i><h3>Arraste uma imagem aqui</h3><p>ou clique para selecionar</p>
-                    <div class="formats">Suporta: PNG, JPG, JPEG, WEBP, GIF, BMP, TIFF, HEIC, HEIF</div>
-                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
-                </div>
-                <div class="image-preview" id="imagePreview"><img id="previewImg" src="" alt="Preview"><button class="remove-image" id="removeImage"><i class="fas fa-times"></i></button></div>
-            </div>
-            <div class="ai-selection">
-                <div class="section-title"><i class="fas fa-robot"></i>Escolha a IA de Destino</div>
-                <div class="ai-grid">
-                    <div class="ai-option active" data-ai="chatgpt"><i class="fas fa-robot" style="color: #10a37f;"></i><span>ChatGPT</span></div>
-                    <div class="ai-option" data-ai="claude"><i class="fas fa-brain" style="color: #d97757;"></i><span>Claude</span></div>
-                    <div class="ai-option" data-ai="gemini"><i class="fas fa-sparkles" style="color: #4285f4;"></i><span>Gemini</span></div>
-                    <div class="ai-option" data-ai="midjourney"><i class="fas fa-palette" style="color: #ffffff; text-shadow: 0 0 10px rgba(0,0,0,0.3);"></i><span>Midjourney</span></div>
-                    <div class="ai-option" data-ai="stable"><i class="fas fa-image" style="color: #ff6b6b;"></i><span>Stable Diff.</span></div>
-                    <div class="ai-option" data-ai="dalle"><i class="fas fa-paint-brush" style="color: #00a67d;"></i><span>DALL-E</span></div>
-                </div>
-            </div>
-            <div class="action-buttons"><button class="action-btn" onclick="clearAll()"><i class="fas fa-trash-alt"></i>Limpar Tudo</button></div>
-            <button class="submit-btn" id="submitBtn" onclick="generatePrompt()"><i class="fas fa-magic"></i><span>Gerar Prompt Detalhado</span></button>
-            <div class="loading" id="loading"><div class="spinner"></div><p>Analisando imagem e gerando prompt detalhado...</p></div>
-            <div class="result-area" id="resultArea">
-                <div class="result-header">
-                    <h3><i class="fas fa-check-circle"></i> Prompt Detalhado Gerado</h3>
-                    <div class="result-actions">
-                        <button class="copy-btn" onclick="copyPrompt()"><i class="fas fa-copy"></i>Copiar Prompt</button>
-                        <button class="clear-btn" onclick="clearResult()"><i class="fas fa-times"></i>Fechar</button>
-                    </div>
-                </div>
-                <div class="result-content" id="resultContent"></div>
-            </div>
-        </main>
-    </div>
-    <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMessage">Copiado com sucesso!</span></div>
-    <script>
-        let selectedAI = 'chatgpt';
-        let currentImageData = null;
-        const aiOptions = document.querySelectorAll('.ai-option');
-        aiOptions.forEach(option => { option.addEventListener('click', function() { aiOptions.forEach(opt => opt.classList.remove('active')); this.classList.add('active'); selectedAI = this.dataset.ai; showToast('IA selecionada: ' + this.querySelector('span').textContent, 'success'); }); });
-        const urlInput = document.getElementById('urlInput');
-        async function loadFromURL() {
-            const url = urlInput.value.trim();
-            if (!url) { showError('Por favor, insira uma URL válida'); return; }
-            showError('');
-            try {
-                const loadBtn = document.querySelector('.load-url-btn');
-                loadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
-                loadBtn.disabled = true;
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Falha ao carregar imagem');
-                const blob = await response.blob();
-                const file = new File([blob], 'image_from_url.' + blob.type.split('/')[1], { type: blob.type });
-                handleImage(file);
-                loadBtn.innerHTML = '<i class="fas fa-download"></i> Carregar';
-                loadBtn.disabled = false;
-                showToast('Imagem carregada com sucesso!', 'success');
-            } catch (error) { showError('Erro ao carregar imagem: ' + error.message); const loadBtn = document.querySelector('.load-url-btn'); loadBtn.innerHTML = '<i class="fas fa-download"></i> Carregar'; loadBtn.disabled = false; }
-        }
-        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
-        const imageInput = document.getElementById('imageInput');
-        const imagePreview = document.getElementById('imagePreview');
-        const previewImg = document.getElementById('previewImg');
-        const removeImage = document.getElementById('removeImage');
-        uploadPlaceholder.addEventListener('click', () => imageInput.click());
-        uploadPlaceholder.addEventListener('dragover', (e) => { e.preventDefault(); uploadPlaceholder.style.borderColor = 'var(--primary)'; uploadPlaceholder.style.background = 'rgba(99, 102, 241, 0.1)'; });
-        uploadPlaceholder.addEventListener('dragleave', () => { uploadPlaceholder.style.borderColor = 'var(--border)'; uploadPlaceholder.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%)'; });
-        uploadPlaceholder.addEventListener('drop', (e) => { e.preventDefault(); uploadPlaceholder.style.borderColor = 'var(--border)'; uploadPlaceholder.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%)'; const files = e.dataTransfer.files; if (files.length > 0) handleImage(files[0]); });
-        imageInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleImage(e.target.files[0]); });
-        function handleImage(file) { if (file.type.startsWith('image/')) { const reader = new FileReader(); reader.onload = (e) => { previewImg.src = e.target.result; currentImageData = e.target.result; imagePreview.style.display = 'block'; uploadPlaceholder.style.display = 'none'; urlInput.value = ''; }; reader.readAsDataURL(file); } else { showError('Formato de arquivo não suportado'); } }
-        removeImage.addEventListener('click', () => { imagePreview.style.display = 'none'; uploadPlaceholder.style.display = 'block'; imageInput.value = ''; currentImageData = null; });
-        function showError(msg) { const el = document.getElementById('errorMessage'); const txt = document.getElementById('errorText'); if (msg) { txt.textContent = msg; el.classList.add('show'); } else { el.classList.remove('show'); } }
-        function showToast(msg, type = 'success') { const toast = document.getElementById('toast'); const txt = document.getElementById('toastMessage'); toast.className = 'toast ' + type; txt.textContent = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
-        async function generatePrompt() {
-            const hasImage = currentImageData !== null || urlInput.value.trim() !== '';
-            if (!hasImage) { showError('Por favor, carregue uma imagem ou insira uma URL'); return; }
-            const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
-            const resultArea = document.getElementById('resultArea');
-            submitBtn.disabled = true; loading.style.display = 'block'; resultArea.style.display = 'none'; showError('');
-            await new Promise(resolve => setTimeout(resolve, 2500));
-            const prompt = generateDetailedPrompt(selectedAI);
-            document.getElementById('resultContent').textContent = prompt;
-            loading.style.display = 'none'; resultArea.style.display = 'block'; submitBtn.disabled = false;
-            resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        function generateDetailedPrompt(ai) {
-            const prompts = {
-                chatgpt: 'ANÁLISE DETALHADA DA IMAGEM DE REFERÊNCIA\n════════════════════════════════════════════════════════════\n\n🎨 ESTILO VISUAL:\n- Categoria: Fotografia profissional / Arte digital / Design moderno\n- Movimentos artísticos: Realismo contemporâneo com elementos minimalistas\n- Humor e tom: Elegante, sofisticado e atemporal\n\n📐 COMPOSIÇÃO:\n- Estrutura: Proporção áurea aplicada / Regra dos terços\n- Enquadramento: Fechado/cropped / Plano americano / Close-up detalhado\n- Profundidade: Campo nítido com desfoque seletivo (bokeh)\n- Perspectiva: Frontal / ¾ / Estúdio controlado\n\n🎭 ELEMENTOS PRINCIPAIS:\n- Primeiro plano: Elemento focal principal com alta definição\n- Segundo plano: Elementos de suporte que criam contexto\n- Fundo: Ambiente controlado com iluminação profissional\n\n💡 ILUMINAÇÃO:\n- Tipo de luz: Luz natural suave / Luz de estúdio (key + fill)\n- Direção: Lateral suave / Top-down / Contraluz controlado\n- Qualidade: Softbox / Janela difusa / Luz ambiente equilibrada\n- Temperatura: Quente (3200K) / Fria (5600K) / Mista equilibrada\n\n🌈 PALETA DE CORES:\n- Cores dominantes: [Analisar da imagem]\n- Cores de acento: [Analisar da imagem]\n- Contraste: Alto contraste / Baixo contraste / Médio\n- Saturação: Vibrante / Sutil / Neutra\n\n🔮 TEXTURA E DETALHES:\n- Acabamento superficial: Mate / Brilho sutil / Seda / Fosco\n- Detalhes táteis perceptíveis: [Alta definição nos elementos]\n- Qualidade técnica: 8K / Ultra HD / photorealistic\n\n📏 PROPORÇÕES E ESPECIFICAÇÕES:\n- Aspect ratio recomendado: 16:9 / 4:3 / 1:1 / 9:16\n- Resolução mínima: 4K (3840x2160)\n\n💬 PROMPT OTIMIZADO PARA CHATGPT/DALL-E:\n"Create a [descrição detalhada do estilo], featuring [elementos principais], with [tipo de iluminação], color palette dominated by [cores], [composição], ultra-detailed, 8k resolution, professional photography, masterpiece, best quality"\n\n🔧 PARÂMETROS RECOMENDADOS:\n- Quality: High / Ultra\n- Style: Photorealistic / Digital art\n- Lighting: Professional studio / Natural\n- Details: Maximum',
-                claude: 'ANÁLISE PROFUNDA DA IMAGEM DE REFERÊNCIA\n════════════════════════════════════════════════════════════\n\n🎯 CONCEITO E INTENÇÃO:\n- Mensagem principal transmitida: [Elegância, sofisticação, modernidade]\n- Emoção evocada: Calma / Energia / Misterio / Serenidade\n\n🎨 IDENTIDADE VISUAL:\n- Estilo artístico: Hibrido entre clássico e contemporâneo\n- Tratamento de imagem: Editing profissional com gradação de cor\n- Referências: Influências de artistas/movimentos específicos\n\n📸 ESPECIFICAÇÕES TÉCNICAS:\n• Câmera/Lente: Prime lens / Zoom profissional\n• Abertura: f/1.4 - f/2.8 (profundidade de campo rasa)\n• ISO: 100-400 (baixo ruído)\n\n💡 ANÁLISE DE ILUMINAÇÃO:\nLuz principal (Key Light):\n- Posição: 45° lateral / Frontal a 30°\n- Intensidade: Suave-média / Dura-média\n- Modificador: Softbox octagonal / Beauty dish\n\nLuz de Preenchimento (Fill Light):\n- Intensidade: 1-2 stops abaixo da key\n- Função: Reduzir sombras duras\n\nLuz de Contorno (Rim Light):\n- Posição: Atrás do sujeito\n- Função: Separar do fundo\n\n🎨 PALETA CROMÁTICA DETALHADA:\nCores Primárias:\n- Cor 1: HEX #XXXXXX - [descrição]\n- Cor 2: HEX #XXXXXX - [descrição]\n\nCores de Acento:\n- Cor 3: HEX #XXXXXX - para highlights\n\n🌫️ TRATAMENTO DE COR:\n- Color grading: [Estilo específico]\n- Curves: [Ajuste de RGB]\n\n📐 DIREÇÃO DE ARTE:\n- Elementos de cena: [Descrição dos objetos]\n- Styling: [Direção de estilo e figurino]\n- Props: [Acessórios e elementos adicionais]\n\n🔧 PROMPT FINAL PARA CLAUDE:\n"An image of [subject description], captured with professional studio lighting setup, featuring [specific lighting details], color palette including [list colors], composition following [rule of thirds/golden ratio], in the style of [artistic reference], ultra-detailed, 8k, professional color grading, masterpiece, award-winning photography"',
-                midjourney: '/imagine prompt: [DESCRIÇÃO COMPLETA]\n\n🎨 ESTILO ARTÍSTICO:\n- Gênero visual: Fotografia/Ilustração/Digital art/3D render\n- Tratamento: Clean/Grungy/Vintage/Modern\n- Influências: Artistas ou movimentos de referência\n\n🌈 PALETA DE CORES:\n- Primary tones: [Cores dominantes]\n- Accent colors: [Cores de destaque]\n- Color mood: Warm/Cool/Neutral/Muted/Bright\n\n💡 ILUMINAÇÃO:\n- Main light: Sunlight/Studio light/Neon\n- Lighting mood: Dramatic/Soft/Ethereal/Moody\n- Shadow intensity: Deep/Soft/Sharp\n\n📐 COMPOSIÇÃO:\n- Shot type: Close-up/Wide/Portrait/Landscape\n- Angle: Eye level/Birds eye/Worms eye\n- Depth of field: Shallow/Deep/Variable\n\n🎭 DETALHES VISUAIS:\n- Subject: [Descrição detalhada do sujeito]\n- Setting: Ambiente e contexto\n- Textures: Texturas presentes\n- Materials: Materiais visíveis\n\n--ar 16:9 --v 6 --style raw --q 2\n--chaos 20 --stylize 750 --weird 0',
-                stable: 'Positive prompt:\n(masterpiece, best quality, ultra-detailed:1.3), [estilo visual], [composição detalhada], [iluminação específica], [paleta de cores], [textura], professional lighting, sharp focus, detailed eyes, intricate details, beautiful composition\n\nNegative prompt:\n(worst quality, low quality:1.4), blurry, distorted, ugly, duplicate, morbid, mutilated, out of frame, extra fingers, too many fingers, cross-eyed, poorly drawn face, mutation, mutated\n\nSettings:\n- Steps: 30-50\n- CFG Scale: 7-9\n- Sampler: DPM++ 2M Karras\n- Resolution: 1024x1024',
-                dalle: 'CREATE A DETAILED IMAGE DESCRIPTION:\n\nSubject: [Descrição detalhada do sujeito principal]\n\nSetting/Background: [Ambiente, fundo, contexto]\n\nStyle: [Fotografia/Ilustração/Pintura digital/3D]\n\nLighting: [Tipo de iluminação - natural/artificial/dramática/suave]\n\nColors: [Paleta de cores dominante e de acento]\n\nMood/Emotion: [Humor, tom, atmosfera]\n\nTechnical Quality: Ultra-detailed, 8K, photorealistic, high resolution, professional photography\n\nAdditional Details: [Outros detalhes específicos como texturas, padrões, materiais]\n\nIMPORTANT: Create a visually stunning, coherent image that matches all these specifications.',
-                gemini: 'ANÁLISE MULTIMODAL AVANÇADA\n════════════════════════════════════════════════════════════\n\n🔍 DETECÇÃO DE ELEMENTOS:\n✓ Objeto principal identificado\n✓ Contexto ambiental reconhecido\n✓ Estilo visual categorizado\n✓ Qualidade técnica avaliada\n\n🎨 CARACTERÍSTICAS VISUAIS:\n- Estilo: Contemporâneo e refinado\n- Cores: Vibrantes e equilibradas\n- Composição: Dinâmica e interessante\n- Qualidade: Profissional\n\n💬 PROMPT GERADO:\n"High-quality professional image, contemporary style, vibrant balanced colors, dynamic composition, refined aesthetic, ultra-detailed, photorealistic, 8k resolution, studio lighting, masterpiece quality"'
-            };
-            return prompts[ai] || prompts.chatgpt;
-        }
-        function copyPrompt() { const content = document.getElementById('resultContent').textContent; navigator.clipboard.writeText(content).then(() => { showToast('Prompt copiado com sucesso!'); }); }
-        function clearResult() { document.getElementById('resultArea').style.display = 'none'; }
-        function clearAll() { document.getElementById('urlInput').value = ''; imagePreview.style.display = 'none'; uploadPlaceholder.style.display = 'block'; imageInput.value = ''; currentImageData = null; document.getElementById('resultArea').style.display = 'none'; showToast('Todos os campos foram limpos'); }
-    </script>
+<div class="container">
+<h1>Gerador de Prompt IA</h1>
+
+<textarea placeholder="Descreva o que deseja criar..."></textarea>
+
+<input type="text" placeholder="Cole uma URL (opcional)">
+
+<input type="file">
+
+<button>Gerar Prompt</button>
+
+<div class="result">
+Seu prompt detalhado aparecerá aqui...
+</div>
+
+</div>
 </body>
 </html>
