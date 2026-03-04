@@ -77,24 +77,74 @@ Seu prompt detalhado aparecerá aqui...
 <script>
 document.querySelector("button").addEventListener("click", function(){
 
-let texto = document.querySelector("textarea").value;
+let texto = document.querySelector("textarea").value.toLowerCase();
 let url = document.querySelector("input[type='text']").value;
 
-let resultado = `
-Crie uma imagem ultra realista baseada na seguinte descrição:
+if(texto.trim() === ""){
+document.querySelector(".result").innerText = "Digite uma descrição primeiro.";
+return;
+}
 
+let estilo = "";
+let composicao = "";
+let luz = "";
+let tipografia = "";
+let cores = "";
+
+if(texto.includes("futebol") || texto.includes("jogador")){
+estilo = "Estilo esportivo cinematográfico inspirado em campanhas da Nike e Adidas.";
+composicao = "Plano médio em ângulo baixo, jogador centralizado, torcida desfocada ao fundo, profundidade de campo intensa.";
+luz = "Iluminação dramática com backlight forte simulando refletores de estádio, chuva destacada com luz lateral.";
+tipografia = "Tipografia sans-serif impactante como Bebas Neue ou Oswald para títulos.";
+cores = "Paleta com tons escuros, azul profundo, verde gramado vibrante e highlights brancos.";
+}
+else if(texto.includes("logo")){
+estilo = "Estilo minimalista moderno com foco em identidade visual forte.";
+composicao = "Logo centralizado em fundo neutro com variações monocromáticas.";
+luz = "Iluminação suave de estúdio com sombras leves.";
+tipografia = "Tipografia geométrica como Montserrat ou Poppins.";
+cores = "Paleta reduzida com 2 a 3 cores principais.";
+}
+else{
+estilo = "Estilo ultra realista com acabamento premium.";
+composicao = "Composição equilibrada seguindo regra dos terços.";
+luz = "Iluminação cinematográfica suave com contraste controlado.";
+tipografia = "Tipografia moderna limpa como Poppins ou Helvetica.";
+cores = "Paleta harmônica com contraste equilibrado.";
+}
+
+let resultado = `
+PROMPT PROFISSIONAL DETALHADO:
+
+Descrição principal:
 ${texto}
 
-Caso exista referência visual na URL:
-${url}
+Direção de Arte:
+${estilo}
 
-A imagem deve conter iluminação cinematográfica, detalhes em alta definição, textura realista, profundidade de campo e cores vibrantes.
+Composição:
+${composicao}
+
+Iluminação:
+${luz}
+
+Tipografia:
+${tipografia}
+
+Paleta de Cores:
+${cores}
+
+Configuração Técnica:
+Capturado em 85mm f/1.8, ultra high resolution, 8K, textura realista, nitidez extrema, profundidade de campo cinematográfica.
+
+Referência opcional:
+${url || "Nenhuma"}
 `;
 
 document.querySelector(".result").innerText = resultado;
 
 });
 </script>
-
 </body>
 </html>
+
