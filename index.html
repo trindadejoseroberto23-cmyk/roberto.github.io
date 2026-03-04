@@ -74,79 +74,43 @@ Seu prompt detalhado aparecerá aqui...
 </div>
 </div>
 
-<script>
-document.querySelector("button").addEventListener("click", function(){
+²<script>
+document.querySelector("button").addEventListener("click", async function(){
 
-let texto = document.querySelector("textarea").value.toLowerCase();
-let url = document.querySelector("input[type='text']").value;
+let texto = document.querySelector("textarea").value;
 
 if(texto.trim() === ""){
 document.querySelector(".result").innerText = "Digite uma descrição primeiro.";
 return;
 }
 
-let estilo = "";
-let composicao = "";
-let luz = "";
-let tipografia = "";
-let cores = "";
+document.querySelector(".result").innerText = "Gerando prompt profissional...";
 
-if(texto.includes("futebol") || texto.includes("jogador")){
-estilo = "Estilo esportivo cinematográfico inspirado em campanhas da Nike e Adidas.";
-composicao = "Plano médio em ângulo baixo, jogador centralizado, torcida desfocada ao fundo, profundidade de campo intensa.";
-luz = "Iluminação dramática com backlight forte simulando refletores de estádio, chuva destacada com luz lateral.";
-tipografia = "Tipografia sans-serif impactante como Bebas Neue ou Oswald para títulos.";
-cores = "Paleta com tons escuros, azul profundo, verde gramado vibrante e highlights brancos.";
+try {
+
+const response = await fetch("/api/generate", {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+description: texto
+})
+});
+
+const data = await response.json();
+
+document.querySelector(".result").innerText = data.prompt;
+
+} catch (error) {
+document.querySelector(".result").innerText = "Erro ao gerar prompt.";
 }
-else if(texto.includes("logo")){
-estilo = "Estilo minimalista moderno com foco em identidade visual forte.";
-composicao = "Logo centralizado em fundo neutro com variações monocromáticas.";
-luz = "Iluminação suave de estúdio com sombras leves.";
-tipografia = "Tipografia geométrica como Montserrat ou Poppins.";
-cores = "Paleta reduzida com 2 a 3 cores principais.";
-}
-else{
-estilo = "Estilo ultra realista com acabamento premium.";
-composicao = "Composição equilibrada seguindo regra dos terços.";
-luz = "Iluminação cinematográfica suave com contraste controlado.";
-tipografia = "Tipografia moderna limpa como Poppins ou Helvetica.";
-cores = "Paleta harmônica com contraste equilibrado.";
-}
-
-let resultado = `
-PROMPT PROFISSIONAL DETALHADO:
-
-Descrição principal:
-${texto}
-
-Direção de Arte:
-${estilo}
-
-Composição:
-${composicao}
-
-Iluminação:
-${luz}
-
-Tipografia:
-${tipografia}
-
-Paleta de Cores:
-${cores}
-
-Configuração Técnica:
-Capturado em 85mm f/1.8, ultra high resolution, 8K, textura realista, nitidez extrema, profundidade de campo cinematográfica.
-
-Referência opcional:
-${url || "Nenhuma"}
-`;
-
-document.querySelector(".result").innerText = resultado;
 
 });
 </script>
   
 </body>
 </html>
+
 
 
