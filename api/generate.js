@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-4.1-mini",
         messages: [
           {
             role: "system",
@@ -34,9 +34,15 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    res.status(200).json({
-      prompt: data.choices[0].message.content
-    });
+    if (!data.choices) {
+  return res.status(500).json({ error: data });
+}
+
+res.status(200).json({
+  prompt: data.choices[0].message.content
+});
+      
+    
 
   } catch (error) {
     res.status(500).json({ message: "Erro ao gerar prompt", error });
