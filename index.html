@@ -1,1 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INTERATIVAFM</title>
 
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #000;
+    color: #fff;
+    text-align: center;
+}
+
+.logo {
+    width: 220px;
+    margin-top: 40px;
+    border-radius: 20px;
+}
+
+.player {
+    margin-top: 30px;
+}
+
+button {
+    margin-top: 20px;
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 50px;
+    background: #ff0066;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* chat */
+.chat {
+    margin-top: 30px;
+    width: 90%;
+    max-width: 400px;
+    height: 300px;
+    border: none;
+}
+</style>
+
+</head>
+
+<body>
+
+<img src="logo.png" class="logo">
+
+<div class="player">
+    <audio id="radio"></audio>
+    <br>
+    <a href="http://109.169.23.84:10776" target="_blank">
+    <button>▶ OUVIR AGORA</button>
+</a>
+</div>
+
+<iframe 
+src="https://uk4freenew.listen2myradio.com/chat/frame.php?frameid=2818928"
+class="chat">
+</iframe>
+
+<script>
+function playRadio() {
+    let audio = document.getElementById("radio");
+
+    // limpa e força novo carregamento
+    audio.src = "";
+    audio.src = "http://109.169.23.84:10776/stream";
+
+    audio.load();
+    audio.play().catch(() => {
+        alert("Clique novamente para liberar o áudio 🔊");
+    });
+}
+</script>
+
+</body>
+</html>
