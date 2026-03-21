@@ -6,116 +6,33 @@
 <title>INTERATIVAFM</title>
 
 <style>
-
-    .whatsapp-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #25D366;
-    color: white;
-    font-size: 28px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    box-shadow: 0 0 20px rgba(0,0,0,0.3);
-    z-index: 999;
-    transition: 0.3s;
-}
-
-.whatsapp-btn:hover {
-    transform: scale(1.1);
-}
-
-.chat-box {
-    margin-top: 30px;
-    width: 90%;
-    max-width: 420px;
-    border-radius: 20px;
-    overflow: hidden;
-    background: linear-gradient(135deg, rgba(255,0,150,0.2), rgba(0,200,255,0.2));
-    backdrop-filter: blur(15px);
-    box-shadow: 0 0 30px rgba(255,0,150,0.5), 0 0 60px rgba(0,200,255,0.3);
-}
-
-/* topo do chat */
-.chat-header {
-    padding: 12px;
-    text-align: center;
-    font-weight: bold;
-    background: linear-gradient(45deg, #ff00cc, #3333ff);
-    color: white;
-    font-size: 16px;
-    letter-spacing: 1px;
-}
-
-/* iframe */
-.chat-frame {
-    width: 100%;
-    height: 320px;
-    border: none;
-    background: black;
-}
-
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: url('logo.png') no-repeat center center/cover;
-    height: 100vh;
-    overflow: hidden;
-}
-
-/* overlay escuro + blur */
-.overlay {
-    backdrop-filter: blur(15px);
-    background: rgba(0,0,0,0.7);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-/* logo */
-.logo {
-    width: 300px;
-    border-radius: 20px;
-    box-shadow: 0 0 40px rgba(255,255,255,0.3);
-}
-
-/* player */
-.player {
-    margin-top: 30px;
-    background: rgba(255,255,255,0.1);
-    padding: 20px 40px;
-    border-radius: 20px;
+    font-family: Arial;
+    background: #000;
+    color: #fff;
     text-align: center;
 }
 
-/* botão moderno */
-.play-btn {
-    background: linear-gradient(45deg, #ff00cc, #ff6600);
-    border: none;
-    padding: 15px 40px;
+.logo {
+    width: 220px;
+    margin-top: 40px;
+    border-radius: 20px;
+}
+
+.player {
+    margin-top: 30px;
+}
+
+button {
+    margin-top: 20px;
+    padding: 15px 30px;
     font-size: 18px;
-    color: white;
+    border: none;
     border-radius: 50px;
+    background: #ff0066;
+    color: #fff;
     cursor: pointer;
-    transition: 0.3s;
-}
-
-.play-btn:hover {
-    transform: scale(1.1);
-}
-
-/* status */
-.status {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #ccc;
 }
 
 /* chat */
@@ -125,7 +42,6 @@ body {
     max-width: 400px;
     height: 300px;
     border: none;
-    border-radius: 15px;
 }
 </style>
 
@@ -133,48 +49,33 @@ body {
 
 <body>
 
-<div class="overlay">
+<img src="logo.png" class="logo">
 
-    <img src="logo.png" class="logo">
-
-    <div class="player">
-        <audio id="radio" src="http://109.169.23.84:10776/stream"></audio>
-        
-        <button class="play-btn" onclick="toggleRadio()">▶️ OUVIR AGORA</button>
-        
-        <div class="status" id="status">Parado</div>
-    </div>
-
-    <div class="chat-box">
-    <div class="chat-header">💬 CHAT AO VIVO</div>
-
-    <iframe 
-    src="https://uk4freenew.listen2myradio.com/chat/frame.php?frameid=2818928"
-    class="chat-frame">
-    </iframe>
+<div class="player">
+    <audio id="radio"></audio>
+    <br>
+    <button onclick="playRadio()">▶ OUVIR AGORA</button>
 </div>
 
-</div>
+<iframe 
+src="https://uk4freenew.listen2myradio.com/chat/frame.php?frameid=2818928"
+class="chat">
+</iframe>
 
 <script>
-let radio = document.getElementById("radio");
-let status = document.getElementById("status");
-let playing = false;
+function playRadio() {
+    let audio = document.getElementById("radio");
 
-function toggleRadio() {
-    if (!playing) {
-        radio.play();
-        status.innerText = "🔊 AO VIVO";
-        playing = true;
-    } else {
-        radio.pause();
-        status.innerText = "⏸️ PARADO";
-        playing = false;
-    }
+    // limpa e força novo carregamento
+    audio.src = "";
+    audio.src = "http://109.169.23.84:10776/stream";
+
+    audio.load();
+    audio.play().catch(() => {
+        alert("Clique novamente para liberar o áudio 🔊");
+    });
 }
 </script>
-<a href="https://wa.me/5591983076968"_blank" class="whatsapp-btn">
-    💬
-</a>
+
 </body>
 </html>
